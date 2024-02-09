@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  apache:
+    # image: 'php:8.3.3RC1-apache'
+    build: 
+      dockerfile: ./docker/php-fpm/Dockerfile
+      context: .
+    container_name: php
+    restart: always
+    ports:
+      - '80:80'
+    depends_on:
+      - mysqldb
+    links:
+      - mysqldb 
+    volumes:
+      - ${PWD}:/var/www/html
+  mysqldb:
+    image: mysql:5.7.13
+    ports: 
+        - "3306:3306"
+    environment:
+        MYSQL_DATABASE: myDb
+        MYSQL_USER: user
+        MYSQL_PASSWORD: test
+        MYSQL_ROOT_PASSWORD: test
+    networks:
+        - default
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links: 
+        - mysqldb:mysqldb
+    ports:
+        - 8000:80
+    environment:
+      - PMA_ARBITRARY=1
